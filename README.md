@@ -12,5 +12,5 @@ Note: it's recommended to do this within a windows container. Window dev boxes c
 2. Download and Install the ysoserial.exe from https://github.com/pwntester/ysoserial.net/releases
 
 ## Usage
-python payload_generator.py [cmd] [exe-path]
+python payload_generator.py [cmd] [exe-path]<br>
 python payload_generator.py "curl http://localhost:8000" "C:\\\\Users\\User\\\\ysoserial.net\\\\ysoserial\\\\bin\\\\Debug\\\\ysoserial.exe"
